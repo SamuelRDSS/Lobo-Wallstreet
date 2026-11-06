@@ -8,12 +8,18 @@ PROJECT_ROOT = Path(
     os.environ.get("LOBO_ROOT") or Path(__file__).resolve().parents[2]
 )
 
+IS_VERCEL = os.environ.get("VERCEL") == "1"
+RUNTIME_DATA_ROOT = Path(
+    os.environ.get("LOBO_DATA_DIR")
+    or ("/tmp/lobo-walstreet" if IS_VERCEL else PROJECT_ROOT)
+)
+
 CONFIG_DIR = PROJECT_ROOT / "config"
-DATA_DIR = PROJECT_ROOT / "dados"
+DATA_DIR = RUNTIME_DATA_ROOT / "dados"
 INPUT_DIR = DATA_DIR / "entrada"
 CRM_DIR = DATA_DIR / "crm"
 RAW_LEADS_DIR = DATA_DIR / "brutos"
-OUTPUT_DIR = PROJECT_ROOT / "saida"
+OUTPUT_DIR = RUNTIME_DATA_ROOT / "saida"
 FRONT_DIR = PROJECT_ROOT / "front"
 N8N_DIR = PROJECT_ROOT / "n8n"
 

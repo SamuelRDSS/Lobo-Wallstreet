@@ -107,6 +107,14 @@ iniciar_front.bat
 
 O comando antigo `python front_server.py` continua funcionando, mas agora ele sobe a mesma API FastAPI.
 
+## Deploy na Vercel
+
+O entrypoint FastAPI está configurado em `pyproject.toml`. Na Vercel, os dados
+de execução (SQLite, CRM, CSVs e leads coletados) ficam em `/tmp/lobo-walstreet`,
+pois o diretório do código é somente leitura. Esse armazenamento é temporário e
+pode ser apagado entre execuções; para persistir dados em produção, configure
+um banco e armazenamento externos.
+
 ## n8n
 
 Use o workflow:
