@@ -1,0 +1,111 @@
+{
+  "name": "Webhook - Analisador de leads para venda de sites",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "analisar-leads-sites",
+        "responseMode": "lastNode",
+        "responseData": "firstEntryJson",
+        "options": {}
+      },
+      "id": "2b1d45b8-0b7f-43b9-9ca6-webhook001",
+      "name": "webhook-csv",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -620,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const first = $input.first().json;\nconst body = first.body ?? first;\n\nconst defaultScriptPath = 'C:\\\\CAMINHO\\\\DO\\\\PROJETO\\\\analisar_leads.py';\nconst defaultOutputDir = 'C:\\\\CAMINHO\\\\DO\\\\PROJETO\\\\saida';\n\nconst rawPaths = Array.isArray(body.csvPaths)\n  ? body.csvPaths\n  : Array.isArray(body.files)\n    ? body.files\n    : [body.csvPath ?? body.filePath].filter(Boolean);\n\nif (!rawPaths.length) {\n  throw new Error('Informe csvPath, filePath, csvPaths ou files no body do webhook.');\n}\n\nfunction isAbsoluteWindowsPath(value) {\n  return /^[a-zA-Z]:[\\\\/]/.test(value) || /^\\\\\\\\[^\\\\/]+[\\\\/][^\\\\/]+/.test(value);\n}\n\nfunction cleanPath(value, name, options = {}) {\n  const path = String(value ?? '').trim();\n  if (!path) throw new Error(`${name} vazio.`);\n  if (/[\"\\r\\n%!^&|<>]/.test(path)) throw new Error(`${name} contem caractere nao permitido para comando shell.`);\n  if (!isAbsoluteWindowsPath(path)) throw new Error(`${name} deve ser um caminho absoluto do Windows.`);\n  if (options.csv && !path.toLowerCase().endsWith('.csv')) throw new Error(`${name} deve terminar com .csv.`);\n  return path;\n}\n\nfunction quote(value) {\n  return `\"${value}\"`;\n}\n\nconst scriptPath = cleanPath(body.scriptPath || defaultScriptPath, 'scriptPath');\nconst outputDir = cleanPath(body.outputDir || defaultOutputDir, 'outputDir');\nconst enrich = body.enrichWeb === false ? '' : ' --enrich-web';\n\nreturn rawPaths.map((path) => {\n  const csvPath = cleanPath(path, 'csvPath', { csv: true });\n  const command = `python ${quote(scriptPath)} --input ${quote(csvPath)} --output-dir ${quote(outputDir)}${enrich}`;\n  return { json: { csvPath, outputDir, scriptPath, command } };\n});"
+      },
+      "id": "2b1d45b8-0b7f-43b9-9ca6-code001",
+      "name": "Normalizar entrada",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -380,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.command }}",
+        "executeOnce": false
+      },
+      "id": "2b1d45b8-0b7f-43b9-9ca6-exec001",
+      "name": "Executar analisador",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        0
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const results = $input.all().map((item) => {\n  const raw = String(item.json.stdout ?? '').trim();\n  let parsed = {};\n  let parseError = null;\n\n  if (raw) {\n    try {\n      parsed = JSON.parse(raw);\n    } catch (error) {\n      parseError = error.message;\n    }\n  }\n\n  const exitCode = Number(item.json.exitCode ?? (item.json.error ? 1 : 0));\n  const outputs = parsed.outputs ?? {};\n  const outputPaths = [\n    outputs.all_csv,\n    outputs.html_report,\n    outputs.manifest,\n    ...Object.values(outputs.groups ?? {})\n  ].filter(Boolean);\n\n  return {\n    ok: exitCode === 0 && !parseError && parsed.ok !== false,\n    exitCode,\n    inputPath: parsed.source_file ?? null,\n    totalLeads: parsed.total_leads ?? 0,\n    summary: parsed.summary ?? null,\n    outputPaths,\n    stderr: item.json.stderr ?? null,\n    error: parseError ?? item.json.error?.message ?? item.json.error ?? parsed.error ?? null\n  };\n});\n\nreturn [{\n  json: {\n    ok: results.every((result) => result.ok),\n    count: results.length,\n    results\n  }\n}];"
+      },
+      "id": "2b1d45b8-0b7f-43b9-9ca6-code002",
+      "name": "Responder resultado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "webhook-csv": {
+      "main": [
+        [
+          {
+            "node": "Normalizar entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar entrada": {
+      "main": [
+        [
+          {
+            "node": "Executar analisador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executar analisador": {
+      "main": [
+        [
+          {
+            "node": "Responder resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0f4328db-287d-4fbe-bad7-ef708ad72a51",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "lead-site-analyzer-webhook",
+  "tags": []
+}

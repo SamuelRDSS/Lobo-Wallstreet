@@ -1,0 +1,123 @@
+{
+  "name": "Lobo Walstreet - WhatsApp Business Cloud - Envio",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lobo-whatsapp/send",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "lobo-whatsapp-send-webhook",
+      "name": "Receber envio do Lobo",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -620,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const first = $input.first().json;\nconst body = first.body ?? first;\n\nif (!body.phone) throw new Error('phone e obrigatorio.');\nif (body.mode !== 'template' && !body.message) throw new Error('message e obrigatorio para envio freeform.');\n\nconst isTemplate = body.mode === 'template';\nconst graphPayload = isTemplate\n  ? {\n      messaging_product: 'whatsapp',\n      to: body.phone,\n      type: 'template',\n      template: {\n        name: body.templateName,\n        language: { code: body.languageCode || 'pt_BR' },\n        components: body.templateComponents || []\n      }\n    }\n  : {\n      messaging_product: 'whatsapp',\n      to: body.phone,\n      type: 'text',\n      text: {\n        preview_url: false,\n        body: body.message\n      }\n    };\n\nreturn [{\n  json: {\n    ...body,\n    graphPayload,\n    sentAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "lobo-whatsapp-send-normalize",
+      "name": "Preparar payload WhatsApp",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.WHATSAPP_GRAPH_API_URL || 'https://graph.facebook.com/v21.0') + '/' + $env.WHATSAPP_PHONE_NUMBER_ID + '/messages' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.WHATSAPP_ACCESS_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.graphPayload) }}",
+        "options": {}
+      },
+      "id": "lobo-whatsapp-send-cloud-api",
+      "name": "Enviar WhatsApp Cloud API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, provider: $json } }}",
+        "options": {}
+      },
+      "id": "lobo-whatsapp-send-response",
+      "name": "Responder Lobo",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        180,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Receber envio do Lobo": {
+      "main": [
+        [
+          {
+            "node": "Preparar payload WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar payload WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Enviar WhatsApp Cloud API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar WhatsApp Cloud API": {
+      "main": [
+        [
+          {
+            "node": "Responder Lobo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "lobo-whatsapp-business-cloud-send",
+  "tags": []
+}

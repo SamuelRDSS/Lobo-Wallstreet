@@ -1,0 +1,1334 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lobo Walstreet</title>
+  <style>
+    :root {
+      --bg: #101211;
+      --surface: #171a18;
+      --surface-strong: #20251f;
+      --surface-soft: #121512;
+      --text: #eef3ee;
+      --muted: #9ea99d;
+      --line: #30382f;
+      --accent: #16a34a;
+      --accent-strong: #11833c;
+      --gold: #f5b44b;
+      --red: #f36b5f;
+      --cyan: #45b7b0;
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 292px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      background: #0f1511;
+      border-right: 1px solid var(--line);
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .brand img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 11px;
+      background: var(--surface-soft);
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.18);
+    }
+
+    .actions {
+      display: grid;
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    button,
+    .button {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 10px 12px;
+      min-height: 38px;
+      cursor: pointer;
+      background: var(--accent);
+      color: #071009;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    button:hover,
+    .button:hover {
+      background: var(--accent-strong);
+      color: #ffffff;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    button.secondary,
+    .button.secondary {
+      background: var(--surface-strong);
+      border-color: var(--line);
+      color: var(--text);
+    }
+
+    button.secondary:hover,
+    .button.secondary:hover {
+      background: #283027;
+    }
+
+    .content {
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    .topbar p {
+      margin: 5px 0 0;
+      color: var(--muted);
+    }
+
+    .status-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--muted);
+      max-width: 100%;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--muted);
+      flex: 0 0 auto;
+    }
+
+    .dot.ok {
+      background: var(--accent);
+    }
+
+    .dot.busy {
+      background: var(--gold);
+    }
+
+    .dot.error {
+      background: var(--red);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 27px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 392px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-head strong {
+      font-size: 16px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .table-scroll {
+      max-height: calc(100vh - 258px);
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #111812;
+      color: var(--muted);
+      font-size: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tbody tr {
+      cursor: pointer;
+    }
+
+    tbody tr:hover,
+    tbody tr.selected {
+      background: #1e2a20;
+    }
+
+    .lead-name {
+      font-weight: 700;
+    }
+
+    .small {
+      font-size: 13px;
+    }
+
+    .score {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      height: 33px;
+      border-radius: 8px;
+      background: var(--cyan);
+      color: #061111;
+      font-weight: 800;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border-radius: 8px;
+      padding: 5px 8px;
+      background: var(--surface-strong);
+      color: var(--text);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge.high {
+      background: rgba(22, 163, 74, 0.18);
+      color: #68e394;
+    }
+
+    .badge.medium {
+      background: rgba(245, 180, 75, 0.18);
+      color: #ffd077;
+    }
+
+    .badge.low {
+      background: rgba(243, 107, 95, 0.18);
+      color: #ff9b92;
+    }
+
+    .inline-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .inline-actions .button,
+    .inline-actions button {
+      min-height: 32px;
+      padding: 7px 9px;
+      font-size: 13px;
+    }
+
+    .detail {
+      position: sticky;
+      top: 24px;
+      padding: 16px;
+      overflow: visible;
+    }
+
+    .detail h3 {
+      margin: 0;
+      font-size: 22px;
+      overflow-wrap: anywhere;
+    }
+
+    .detail p {
+      margin: 6px 0 0;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .fact {
+      border-top: 1px solid var(--line);
+      padding-top: 9px;
+      min-height: 54px;
+    }
+
+    .fact span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .fact strong {
+      display: block;
+      margin-top: 3px;
+      overflow-wrap: anywhere;
+    }
+
+    .message-tools {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .reason {
+      border-top: 1px solid var(--line);
+      margin-top: 14px;
+      padding-top: 12px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .empty {
+      padding: 38px 18px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1180px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .filters {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .detail {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .content,
+      .sidebar {
+        padding: 14px;
+      }
+
+      .topbar {
+        display: block;
+      }
+
+      .status-line {
+        margin-top: 12px;
+      }
+
+      .metrics,
+      .filters,
+      .facts,
+      .message-tools {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=160&q=70" alt="Equipe comercial trabalhando">
+        <div>
+          <h1>Lobo Walstreet</h1>
+          <p>Inteligência comercial local</p>
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="field">
+          <label for="search">Busca</label>
+          <input id="search" type="search" placeholder="Nome, cidade, nicho...">
+        </div>
+
+        <div class="field">
+          <label for="priorityFilter">Prioridade</label>
+          <select id="priorityFilter">
+            <option value="">Todas</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="presenceFilter">Presença digital</label>
+          <select id="presenceFilter">
+            <option value="">Todas</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="categoryFilter">Nicho</label>
+          <select id="categoryFilter">
+            <option value="">Todos</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="statusFilter">CRM</label>
+          <select id="statusFilter">
+            <option value="">Todos</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="queueFilter">Fila</label>
+          <select id="queueFilter">
+            <option value="">Todas</option>
+            <option value="novos">Novos</option>
+            <option value="alta_prioridade">Alta prioridade</option>
+            <option value="sem_telefone">Sem telefone</option>
+            <option value="ja_abordados">Já abordados</option>
+            <option value="ignorados">Ignorados</option>
+            <option value="fechados">Fechados</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="collectNiche">Nicho para buscar</label>
+          <input id="collectNiche" type="text" value="barbearia" placeholder="barbearia, clínica, academia...">
+        </div>
+
+        <div class="field">
+          <label for="collectCity">Cidade</label>
+          <input id="collectCity" type="text" value="São José" placeholder="São José, Florianópolis...">
+        </div>
+
+        <div class="field">
+          <label for="collectLimit">Limite</label>
+          <input id="collectLimit" type="number" min="1" max="100" value="30">
+        </div>
+
+        <div class="field">
+          <label for="collectProvider">Fonte</label>
+          <select id="collectProvider">
+            <option value="mock">Mock local</option>
+            <option value="google_places">Google Places</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="collectAnalyzeButton" type="button">Buscar + analisar</button>
+        <button id="collectButton" type="button" class="secondary">Só buscar leads</button>
+        <button id="analyzeButton" type="button">Rodar análise no n8n</button>
+        <button id="reloadButton" type="button" class="secondary">Recarregar leads</button>
+        <a class="button secondary" href="/saida/leads_priorizados.csv" target="_blank">Abrir CSV</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="topbar">
+        <div>
+          <h2>Fila de oportunidades</h2>
+          <p>Leads priorizados, evidências digitais, abordagem pronta e CRM simples.</p>
+        </div>
+        <div class="status-line" id="statusLine">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText">Inicializando painel...</span>
+        </div>
+      </div>
+
+      <section class="metrics" id="metrics"></section>
+
+      <section class="workspace">
+        <div class="panel">
+          <div class="panel-head">
+            <strong>Leads analisados</strong>
+            <span class="muted" id="visibleCount">0 visíveis</span>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Score</th>
+                  <th>Prioridade</th>
+                  <th>Negócio</th>
+                  <th>Presença</th>
+                  <th>Motivo</th>
+                  <th>CRM</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="leadRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <aside class="panel detail" id="detailPanel">
+          <h3>Selecione um lead</h3>
+          <p class="muted">Clique em uma linha para ver evidências, mensagem e próximo passo.</p>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const endpoints = {
+      analyze: '/api/analyze',
+      collect: '/api/collect',
+      collectAnalyze: '/api/collect-and-analyze',
+      pipeline: '/api/pipeline',
+      leads: '/api/leads',
+      message: '/api/message',
+      crm: '/api/crm',
+      statuses: '/api/crm/statuses',
+      whatsappSend: '/api/whatsapp/send',
+      whatsappReplySend: '/api/whatsapp/send-reply',
+      aiDraft: '/api/ai/draft-reply'
+    };
+
+    const state = {
+      leads: [],
+      filtered: [],
+      summary: {},
+      pipeline: {},
+      operationalLeads: [],
+      statuses: [],
+      selectedId: null
+    };
+
+    const elements = {
+      search: document.querySelector('#search'),
+      priorityFilter: document.querySelector('#priorityFilter'),
+      presenceFilter: document.querySelector('#presenceFilter'),
+      categoryFilter: document.querySelector('#categoryFilter'),
+      statusFilter: document.querySelector('#statusFilter'),
+      queueFilter: document.querySelector('#queueFilter'),
+      collectNiche: document.querySelector('#collectNiche'),
+      collectCity: document.querySelector('#collectCity'),
+      collectLimit: document.querySelector('#collectLimit'),
+      collectProvider: document.querySelector('#collectProvider'),
+      collectButton: document.querySelector('#collectButton'),
+      collectAnalyzeButton: document.querySelector('#collectAnalyzeButton'),
+      analyzeButton: document.querySelector('#analyzeButton'),
+      reloadButton: document.querySelector('#reloadButton'),
+      rows: document.querySelector('#leadRows'),
+      detail: document.querySelector('#detailPanel'),
+      metrics: document.querySelector('#metrics'),
+      visibleCount: document.querySelector('#visibleCount'),
+      statusDot: document.querySelector('#statusDot'),
+      statusText: document.querySelector('#statusText')
+    };
+
+    elements.search.addEventListener('input', render);
+    elements.priorityFilter.addEventListener('change', render);
+    elements.presenceFilter.addEventListener('change', render);
+    elements.categoryFilter.addEventListener('change', render);
+    elements.statusFilter.addEventListener('change', render);
+    elements.queueFilter.addEventListener('change', render);
+    elements.collectButton.addEventListener('click', collectLeads);
+    elements.collectAnalyzeButton.addEventListener('click', collectAndAnalyzeLeads);
+    elements.analyzeButton.addEventListener('click', runAnalysis);
+    elements.reloadButton.addEventListener('click', loadLeads);
+
+    elements.rows.addEventListener('click', (event) => {
+      const messageButton = event.target.closest('[data-message]');
+      if (messageButton) {
+        event.preventDefault();
+        generateMessage(messageButton.dataset.message);
+        return;
+      }
+
+      const sendButton = event.target.closest('[data-send-whatsapp]');
+      if (sendButton) {
+        event.preventDefault();
+        sendWhatsAppViaN8n(sendButton.dataset.sendWhatsapp);
+        return;
+      }
+
+      if (event.target.closest('a, button')) return;
+
+      const row = event.target.closest('tr[data-lead-id]');
+      if (!row) return;
+      state.selectedId = row.dataset.leadId;
+      render();
+    });
+
+    init();
+
+    async function init() {
+      await loadStatuses();
+      await loadLeads();
+    }
+
+    async function loadStatuses() {
+      try {
+        const response = await fetch(endpoints.statuses);
+        const payload = await response.json();
+        state.statuses = payload.statuses || ['Não abordado', 'Pronto para envio', 'Abordado', 'Aguardando resposta', 'Respondeu', 'Resposta pendente', 'Interessado', 'Fechado', 'Sem interesse'];
+      } catch {
+        state.statuses = ['Não abordado', 'Pronto para envio', 'Abordado', 'Aguardando resposta', 'Respondeu', 'Resposta pendente', 'Interessado', 'Fechado', 'Sem interesse'];
+      }
+      fillStaticStatusFilter();
+    }
+
+    async function loadLeads() {
+      setStatus('busy', 'Carregando leads...');
+      try {
+        const response = await fetch(`${endpoints.leads}?t=${Date.now()}`);
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) throw new Error(payload.detail || payload.error || `HTTP ${response.status}`);
+        state.leads = (payload.leads || []).map(normalizeLead);
+        state.summary = payload.summary || {};
+        if (!state.selectedId && state.leads[0]) state.selectedId = state.leads[0].lead_id;
+        fillDynamicFilters();
+        await loadPipeline();
+        mergeOperationalLeads();
+        render();
+        setStatus('ok', `${state.leads.length} leads carregados de ${payload.source || 'saida/leads_priorizados.csv'}`);
+      } catch (error) {
+        state.leads = [];
+        state.summary = {};
+        render();
+        setStatus('error', `Não consegui carregar os leads: ${error.message}`);
+      }
+    }
+
+    async function runAnalysis() {
+      setBusy(true);
+      setStatus('busy', 'n8n analisando CSV, enriquecendo dados e gerando saída...');
+      try {
+        const response = await fetch(endpoints.analyze, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ preferN8n: true, enrichWeb: true })
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) throw new Error(payload.detail || payload.error || `HTTP ${response.status}`);
+
+        const result = payload.result || {};
+        const first = Array.isArray(result.results) ? result.results[0] : null;
+        const total = first?.totalLeads || result.total_leads || payload.summary?.total || '';
+        setStatus('ok', total ? `Análise concluída. ${total} leads atualizados.` : 'Análise concluída. Leads atualizados.');
+        await loadLeads();
+      } catch (error) {
+        setStatus('error', `Erro ao chamar o n8n: ${error.message}`);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function collectLeads() {
+      setBusy(true, 'Buscando leads...');
+      try {
+        const response = await fetch(endpoints.collect, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(collectPayload())
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) throw new Error(payload.detail || payload.error || `HTTP ${response.status}`);
+        state.pipeline = payload.queue || {};
+        await loadPipeline();
+        mergeOperationalLeads();
+        render();
+        renderMetrics();
+        setStatus('ok', `Coleta concluída: ${payload.inserted} novos, ${payload.duplicates} duplicados. CSV operacional atualizado.`);
+      } catch (error) {
+        setStatus('error', `Erro na coleta: ${error.message}`);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function collectAndAnalyzeLeads() {
+      setBusy(true, 'Buscando leads, deduplicando e analisando...');
+      try {
+        const response = await fetch(endpoints.collectAnalyze, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...collectPayload(), preferN8n: false, enrichWeb: true })
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) throw new Error(payload.detail || payload.error || `HTTP ${response.status}`);
+        state.pipeline = payload.queue || {};
+        const inserted = payload.collection?.inserted ?? 0;
+        const duplicates = payload.collection?.duplicates ?? 0;
+        const total = payload.analysis?.total_leads || payload.analysis?.totalLeads || payload.collection?.exportedToCsv || '';
+        setStatus('ok', `Coleta + análise concluída: ${inserted} novos, ${duplicates} duplicados, ${total} leads na fila.`);
+        await loadLeads();
+      } catch (error) {
+        setStatus('error', `Erro ao buscar e analisar: ${error.message}`);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function loadPipeline() {
+      try {
+        const response = await fetch(`${endpoints.pipeline}?t=${Date.now()}`);
+        const payload = await response.json();
+        if (response.ok && payload.ok) {
+          state.pipeline = payload.queue || {};
+          state.operationalLeads = payload.leads || [];
+        }
+      } catch {
+        state.pipeline = {};
+        state.operationalLeads = [];
+      }
+    }
+
+    function mergeOperationalLeads() {
+      const currentIds = new Set(state.leads.map((lead) => lead.lead_id));
+      const extra = state.operationalLeads
+        .filter((lead) => !currentIds.has(lead.id))
+        .map((lead) => normalizeLead({
+          lead_id: lead.id,
+          nome: lead.nome,
+          nicho: lead.categoria,
+          categoria_original: lead.categoria,
+          cidade: lead.cidade,
+          estado: lead.estado,
+          telefone: lead.telefone,
+          website: lead.website,
+          endereco: lead.endereco,
+          score: lead.score || '0',
+          chance: lead.chance || 'Novo',
+          presenca_digital: lead.presenca_digital || 'Não analisado',
+          motivo: lead.motivo || 'Lead capturado automaticamente e aguardando análise.',
+          crm_status: lead.crm_status || 'Não abordado',
+          crm_notes: lead.crm_notes || '',
+          url_detectada: lead.url_detectada || '',
+          fonte_detectada: lead.fonte_detectada || '',
+          titulo_detectado: lead.titulo_detectado || '',
+          mensagem_whatsapp: lead.mensagem_gerada || '',
+          abordagem: lead.mensagem_gerada || ''
+        }));
+      state.leads = [...state.leads, ...extra];
+    }
+
+    function normalizeLead(lead) {
+      return {
+        ...lead,
+        score_num: Number(lead.score_num || lead.score || 0),
+        avaliacoes_num: Number(lead.avaliacoes || 0),
+        crm_status: lead.crm_status || 'Não abordado',
+        crm_notes: lead.crm_notes || '',
+        last_reply_message: lead.last_reply_message || '',
+        ai_suggestion: lead.ai_suggestion || '',
+        pending_ai_reply: lead.pending_ai_reply || lead.ai_suggestion || '',
+        reply_pending_approval: Boolean(lead.reply_pending_approval),
+        last_ai_reply_sent: lead.last_ai_reply_sent || ''
+      };
+    }
+
+    function fillStaticStatusFilter() {
+      elements.statusFilter.innerHTML = '<option value="">Todos</option>' + state.statuses.map((status) => (
+        `<option value="${escapeAttr(status)}">${escapeHtml(status)}</option>`
+      )).join('');
+    }
+
+    function fillDynamicFilters() {
+      fillSelect(elements.priorityFilter, unique('chance'), 'Todas');
+      fillSelect(elements.presenceFilter, unique('presenca_digital'), 'Todas');
+      fillSelect(elements.categoryFilter, unique('nicho'), 'Todos');
+    }
+
+    function fillSelect(select, values, allLabel) {
+      const current = select.value;
+      select.innerHTML = `<option value="">${allLabel}</option>`;
+      values.forEach((value) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+      select.value = values.includes(current) ? current : '';
+    }
+
+    function unique(field) {
+      return [...new Set(state.leads.map((lead) => lead[field]).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    }
+
+    function render() {
+      const query = normalizeText(elements.search.value);
+      const chance = elements.priorityFilter.value;
+      const presence = elements.presenceFilter.value;
+      const category = elements.categoryFilter.value;
+      const status = elements.statusFilter.value;
+      const queue = elements.queueFilter.value;
+
+      state.filtered = state.leads.filter((lead) => {
+        const haystack = normalizeText([
+          lead.nome,
+          lead.nicho,
+          lead.categoria_original,
+          lead.cidade,
+          lead.estado,
+          lead.presenca_digital,
+          lead.motivo,
+          lead.titulo_detectado
+        ].join(' '));
+
+        return (!query || haystack.includes(query))
+          && (!chance || lead.chance === chance)
+          && (!presence || lead.presenca_digital === presence)
+          && (!category || lead.nicho === category)
+          && (!status || lead.crm_status === status)
+          && (!queue || leadQueue(lead) === queue);
+      });
+
+      renderMetrics();
+      renderRows();
+      renderDetail();
+    }
+
+    function renderMetrics() {
+      const summary = state.summary || {};
+      const queue = state.pipeline || {};
+      const cards = [
+        ['Total de leads', summary.total || state.leads.length || 0],
+        ['Sem site', summary.sem_site || 0],
+        ['Com site', summary.com_site || 0],
+        ['Só rede social', summary.so_rede_social || 0],
+        ['App encontrado', summary.app_encontrado || 0],
+        ['Prioridade alta', summary.prioridade_alta || 0]
+      ];
+      if (queue.total) {
+        cards.push(['Base SQLite', queue.total]);
+        cards.push(['Novos', queue.novos || 0]);
+        cards.push(['Sem telefone', queue.sem_telefone || 0]);
+      }
+
+      elements.metrics.innerHTML = cards.map(([label, value]) => `
+        <div class="metric">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(String(value))}</strong>
+        </div>
+      `).join('');
+    }
+
+    function renderRows() {
+      elements.visibleCount.textContent = `${state.filtered.length} visíveis`;
+      if (!state.filtered.length) {
+        elements.rows.innerHTML = '<tr><td colspan="7" class="empty">Nenhum lead apareceu com esses filtros.</td></tr>';
+        return;
+      }
+
+      elements.rows.innerHTML = state.filtered.map((lead) => {
+        const selected = lead.lead_id === state.selectedId ? ' selected' : '';
+        return `
+          <tr class="${selected}" data-lead-id="${escapeAttr(lead.lead_id)}">
+            <td><span class="score">${escapeHtml(lead.score || '0')}</span></td>
+            <td><span class="badge ${priorityClass(lead.chance)}">${escapeHtml(lead.chance || 'Sem prioridade')}</span></td>
+            <td>
+              <div class="lead-name">${escapeHtml(lead.nome || 'Sem nome')}</div>
+              <div class="muted small">${escapeHtml(compact([lead.cidade, lead.estado], ' / '))}</div>
+            </td>
+            <td>
+              ${escapeHtml(lead.presenca_digital || 'Não informado')}
+              ${lead.url_detectada ? `<div class="muted small">${escapeHtml(lead.fonte_detectada || 'evidência')}</div>` : ''}
+            </td>
+            <td class="small">${escapeHtml(shortText(lead.motivo, 92))}</td>
+            <td>${escapeHtml(lead.crm_status)}</td>
+            <td><div class="inline-actions">${rowActions(lead)}</div></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function rowActions(lead) {
+      const parts = [
+        `<button type="button" class="secondary" data-message="${escapeAttr(lead.lead_id)}">Gerar abordagem</button>`
+      ];
+      if (lead.telefone) parts.push(`<button type="button" data-send-whatsapp="${escapeAttr(lead.lead_id)}">Enviar n8n</button>`);
+      const whatsapp = whatsappUrl(lead);
+      if (whatsapp) parts.push(`<a class="button" href="${escapeAttr(whatsapp)}" target="_blank">WhatsApp</a>`);
+      if (lead.url_detectada) parts.push(`<a class="button secondary" href="${escapeAttr(lead.url_detectada)}" target="_blank">Evidência</a>`);
+      return parts.join('');
+    }
+
+    function collectPayload() {
+      return {
+        nicho: elements.collectNiche.value.trim() || 'negócio local',
+        cidade: elements.collectCity.value.trim() || 'São José',
+        limite: Number(elements.collectLimit.value || 30),
+        provider: elements.collectProvider.value || 'mock'
+      };
+    }
+
+    function leadQueue(lead) {
+      if (!lead.telefone) return 'sem_telefone';
+      if (lead.crm_status === 'Fechado') return 'fechados';
+      if (lead.crm_status === 'Sem interesse') return 'ignorados';
+      if (['Abordado', 'Aguardando resposta', 'Respondeu', 'Resposta pendente', 'Interessado'].includes(lead.crm_status)) {
+        return 'ja_abordados';
+      }
+      if (lead.chance === 'Alta chance') return 'alta_prioridade';
+      return 'novos';
+    }
+
+    function renderDetail() {
+      const lead = state.leads.find((item) => item.lead_id === state.selectedId);
+      if (!lead) {
+        elements.detail.innerHTML = '<h3>Selecione um lead</h3><p class="muted">Clique em uma linha para ver evidências, mensagem e próximo passo.</p>';
+        return;
+      }
+
+      const evidence = lead.url_detectada
+        ? `<a class="button secondary" href="${escapeAttr(lead.url_detectada)}" target="_blank">Ver evidência</a>`
+        : '';
+      const maps = lead.google_maps
+        ? `<a class="button secondary" href="${escapeAttr(lead.google_maps)}" target="_blank">Abrir Maps</a>`
+        : '';
+      const site = lead.website
+        ? `<a class="button secondary" href="${escapeAttr(lead.website)}" target="_blank">Site atual</a>`
+        : '';
+      const whatsapp = whatsappUrl(lead)
+        ? `<a class="button" href="${escapeAttr(whatsappUrl(lead))}" target="_blank">WhatsApp manual</a>`
+        : '';
+
+      elements.detail.innerHTML = `
+        <h3>${escapeHtml(lead.nome || 'Lead sem nome')}</h3>
+        <p class="muted">${escapeHtml(compact([lead.categoria_original, lead.cidade, lead.estado], ' / '))}</p>
+
+        <div class="facts">
+          <div class="fact"><span>Score</span><strong>${escapeHtml(lead.score || '0')}</strong></div>
+          <div class="fact"><span>Prioridade</span><strong>${escapeHtml(lead.chance || 'Sem prioridade')}</strong></div>
+          <div class="fact"><span>Presença</span><strong>${escapeHtml(lead.presenca_digital || 'Não informado')}</strong></div>
+          <div class="fact"><span>Avaliações</span><strong>${escapeHtml(lead.avaliacoes || '0')}</strong></div>
+        </div>
+
+        <div class="field">
+          <label for="crmStatus">Status comercial</label>
+          <select id="crmStatus">
+            ${state.statuses.map((status) => `<option value="${escapeAttr(status)}" ${status === lead.crm_status ? 'selected' : ''}>${escapeHtml(status)}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="crmNotes">Histórico rápido</label>
+          <textarea id="crmNotes" placeholder="Ex: respondeu, pediu preço, chamar amanhã...">${escapeHtml(lead.crm_notes)}</textarea>
+        </div>
+
+        <div class="inline-actions">
+          ${whatsapp}${maps}${site}${evidence}
+        </div>
+
+        ${lead.last_reply_message ? `
+          <div class="reason">
+            <strong>Última resposta:</strong> ${escapeHtml(lead.last_reply_message)}
+            ${lead.reply_pending_approval ? '<br><strong>Status:</strong> resposta aguardando confirmação humana.' : ''}
+          </div>
+        ` : ''}
+
+        ${lead.pending_ai_reply ? `
+          <div class="field" style="margin-top: 14px;">
+            <label for="aiReplyBox">Resposta sugerida pela IA</label>
+            <textarea id="aiReplyBox">${escapeHtml(lead.pending_ai_reply)}</textarea>
+            <div class="message-tools">
+              <button type="button" id="confirmAiReply">Confirmar e enviar resposta</button>
+              <button type="button" id="copyAiReply" class="secondary">Copiar resposta</button>
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="field" style="margin-top: 14px;">
+          <label for="messageBox">Abordagem pronta</label>
+          <textarea id="messageBox" readonly>${escapeHtml(lead.abordagem || '')}</textarea>
+          <div class="message-tools">
+            <button type="button" id="copyMessage" class="secondary">Copiar mensagem</button>
+            <button type="button" id="refreshMessage">Gerar abordagem</button>
+            <button type="button" id="sendN8n" class="secondary">Enviar via n8n</button>
+          </div>
+        </div>
+
+        <div class="reason">
+          <strong>Motivo:</strong> ${escapeHtml(lead.motivo || 'Sem motivo informado.')}
+          ${lead.titulo_detectado ? `<br><strong>Evidência:</strong> ${escapeHtml(compact([lead.fonte_detectada, lead.titulo_detectado], ' - '))}` : ''}
+        </div>
+      `;
+
+      document.querySelector('#crmStatus').addEventListener('change', (event) => {
+        lead.crm_status = event.target.value;
+        saveCrm(lead);
+        renderRows();
+      });
+
+      document.querySelector('#crmNotes').addEventListener('blur', (event) => {
+        lead.crm_notes = event.target.value;
+        saveCrm(lead);
+      });
+
+      document.querySelector('#copyMessage').addEventListener('click', async () => {
+        await navigator.clipboard.writeText(lead.abordagem || '');
+        document.querySelector('#copyMessage').textContent = 'Copiado';
+        setTimeout(() => {
+          const button = document.querySelector('#copyMessage');
+          if (button) button.textContent = 'Copiar mensagem';
+        }, 1000);
+      });
+
+      document.querySelector('#refreshMessage').addEventListener('click', () => generateMessage(lead.lead_id));
+      document.querySelector('#sendN8n').addEventListener('click', () => sendWhatsAppViaN8n(lead.lead_id));
+
+      const aiReplyBox = document.querySelector('#aiReplyBox');
+      const confirmAiReply = document.querySelector('#confirmAiReply');
+      const copyAiReply = document.querySelector('#copyAiReply');
+      if (aiReplyBox && confirmAiReply) {
+        aiReplyBox.addEventListener('input', (event) => {
+          lead.pending_ai_reply = event.target.value;
+        });
+        confirmAiReply.addEventListener('click', () => sendAiReplyViaN8n(lead.lead_id));
+      }
+      if (copyAiReply) {
+        copyAiReply.addEventListener('click', async () => {
+          await navigator.clipboard.writeText(lead.pending_ai_reply || '');
+          copyAiReply.textContent = 'Copiado';
+          setTimeout(() => {
+            const button = document.querySelector('#copyAiReply');
+            if (button) button.textContent = 'Copiar resposta';
+          }, 1000);
+        });
+      }
+    }
+
+    async function generateMessage(leadId) {
+      const lead = state.leads.find((item) => item.lead_id === leadId);
+      if (!lead) return;
+      setStatus('busy', `Gerando abordagem para ${lead.nome || 'lead'}...`);
+      try {
+        const response = await fetch(endpoints.message, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lead })
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) throw new Error(payload.detail || payload.error || `HTTP ${response.status}`);
+        lead.abordagem = payload.message;
+        state.selectedId = lead.lead_id;
+        render();
+        setStatus('ok', 'Abordagem gerada e pronta para copiar.');
+      } catch (error) {
+        setStatus('error', `Não consegui gerar a abordagem: ${error.message}`);
+      }
+    }
+
+    async function saveCrm(lead) {
+      try {
+        const response = await fetch(endpoints.crm, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ leadId: lead.lead_id, status: lead.crm_status, notes: lead.crm_notes || '' })
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) throw new Error(payload.detail || payload.error || `HTTP ${response.status}`);
+        setStatus('ok', 'CRM salvo em dados/crm/crm_status.json');
+      } catch (error) {
+        setStatus('error', `Não consegui salvar o CRM: ${error.message}`);
+      }
+    }
+
+    async function sendWhatsAppViaN8n(leadId) {
+      const lead = state.leads.find((item) => item.lead_id === leadId);
+      if (!lead) return;
+      if (!lead.telefone) {
+        setStatus('error', 'Esse lead não tem telefone para WhatsApp.');
+        return;
+      }
+      const ok = window.confirm(`Enviar mensagem para ${lead.nome || 'este lead'} pelo n8n/WhatsApp Business Cloud?`);
+      if (!ok) return;
+
+      setStatus('busy', `Enviando ${lead.nome || 'lead'} pelo webhook oficial do n8n...`);
+      try {
+        const response = await fetch(endpoints.whatsappSend, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lead,
+            message: lead.abordagem || lead.mensagem_whatsapp || '',
+            approved: true,
+            mode: 'freeform'
+          })
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) throw new Error(payload.detail || payload.error || `HTTP ${response.status}`);
+        lead.crm_status = payload.crm?.status || 'Abordado';
+        lead.last_whatsapp_message = lead.abordagem || lead.mensagem_whatsapp || '';
+        render();
+        setStatus('ok', 'Mensagem enviada para o n8n. CRM marcado como Aguardando resposta.');
+      } catch (error) {
+        setStatus('error', `Não consegui enviar via n8n: ${error.message}`);
+      }
+    }
+
+    async function sendAiReplyViaN8n(leadId) {
+      const lead = state.leads.find((item) => item.lead_id === leadId);
+      if (!lead) return;
+      const replyBox = document.querySelector('#aiReplyBox');
+      const reply = (replyBox?.value || lead.pending_ai_reply || '').trim();
+      if (!reply) {
+        setStatus('error', 'A resposta sugerida está vazia.');
+        return;
+      }
+      if (!lead.telefone) {
+        setStatus('error', 'Esse lead não tem telefone para WhatsApp.');
+        return;
+      }
+      const ok = window.confirm(`Confirmar envio da resposta para ${lead.nome || 'este lead'} pelo n8n/WhatsApp Business Cloud?`);
+      if (!ok) {
+        setStatus('ok', 'Envio cancelado. A resposta segue pendente de confirmação.');
+        return;
+      }
+
+      setStatus('busy', `Enviando resposta aprovada para ${lead.nome || 'lead'}...`);
+      try {
+        const response = await fetch(endpoints.whatsappReplySend, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lead,
+            reply,
+            approved: true,
+            mode: 'freeform'
+          })
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) throw new Error(payload.detail || payload.error || `HTTP ${response.status}`);
+        lead.crm_status = payload.crm?.status || 'Aguardando resposta';
+        lead.pending_ai_reply = '';
+        lead.reply_pending_approval = false;
+        lead.last_ai_reply_sent = reply;
+        render();
+        setStatus('ok', 'Resposta aprovada e enviada pelo n8n. Lead voltou para Aguardando resposta.');
+      } catch (error) {
+        setStatus('error', `Não consegui enviar a resposta: ${error.message}`);
+      }
+    }
+
+    function setBusy(isBusy, message = '') {
+      elements.collectButton.disabled = isBusy;
+      elements.collectAnalyzeButton.disabled = isBusy;
+      elements.analyzeButton.disabled = isBusy;
+      elements.reloadButton.disabled = isBusy;
+      elements.collectAnalyzeButton.textContent = isBusy ? 'Processando...' : 'Buscar + analisar';
+      elements.collectButton.textContent = isBusy ? 'Buscando...' : 'Só buscar leads';
+      elements.analyzeButton.textContent = isBusy ? 'Analisando...' : 'Rodar análise no n8n';
+      if (message) setStatus('busy', message);
+    }
+
+    function setStatus(kind, text) {
+      elements.statusDot.className = `dot ${kind}`;
+      elements.statusText.textContent = text;
+    }
+
+    function whatsappUrl(lead) {
+      const phone = String(lead.telefone || '').replace(/\D/g, '');
+      if (!phone) return '';
+      const normalized = phone.startsWith('55') ? phone : `55${phone}`;
+      return `https://wa.me/${normalized}?text=${encodeURIComponent(lead.abordagem || lead.mensagem_whatsapp || '')}`;
+    }
+
+    function priorityClass(value) {
+      const normalized = normalizeText(value);
+      if (normalized.includes('alta')) return 'high';
+      if (normalized.includes('media')) return 'medium';
+      if (normalized.includes('baixa') || normalized.includes('dificil') || normalized.includes('nao')) return 'low';
+      return '';
+    }
+
+    function normalizeText(value) {
+      return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+    }
+
+    function shortText(value, max) {
+      const text = String(value || '');
+      return text.length > max ? `${text.slice(0, max - 3)}...` : text;
+    }
+
+    function compact(values, separator) {
+      return values.filter(Boolean).join(separator);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value);
+    }
+  </script>
+</body>
+</html>

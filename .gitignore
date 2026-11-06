@@ -1,0 +1,31 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+config/*.env
+!config/app.example.env
+*.secret
+*.pem
+*.key
+*.p12
+
+# Local data, leads, and generated output
+dados/
+saida/
+*.csv
+*.sqlite
+*.sqlite3
+*.db
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editor and operating-system files
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini

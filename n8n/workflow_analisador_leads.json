@@ -1,0 +1,123 @@
+{
+  "name": "Analisador de leads para venda de sites",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "d0f8c048-4f65-4b48-9c8f-1c7e1ef0c231",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "csv-path",
+              "name": "csvPath",
+              "value": "C:\\CAMINHO\\DO\\PROJETO\\dados\\entrada\\google_places_barbearias_sao_jose.csv",
+              "type": "string"
+            },
+            {
+              "id": "script-path",
+              "name": "scriptPath",
+              "value": "C:\\CAMINHO\\DO\\PROJETO\\analisar_leads.py",
+              "type": "string"
+            },
+            {
+              "id": "output-dir",
+              "name": "outputDir",
+              "value": "C:\\CAMINHO\\DO\\PROJETO\\saida",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b0a6c70-4a04-46d4-8b32-f94b3a628cd0",
+      "name": "Configurar caminhos",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "command": "={{ 'python \"' + $json.scriptPath + '\" --input \"' + $json.csvPath + '\" --output-dir \"' + $json.outputDir + '\" --pretty --enrich-web' }}"
+      },
+      "id": "14ab7b4d-84fe-4dc9-a877-2e7838b79b42",
+      "name": "Executar analisador",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.stdout || $json.data || '';\nlet parsed = {};\ntry {\n  parsed = JSON.parse(raw);\n} catch (error) {\n  parsed = { ok: false, error: error.message, raw };\n}\nreturn [{ json: parsed }];"
+      },
+      "id": "e59a2b87-b0aa-4658-a678-5622ee51cc9d",
+      "name": "Ler resultado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Configurar caminhos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configurar caminhos": {
+      "main": [
+        [
+          {
+            "node": "Executar analisador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executar analisador": {
+      "main": [
+        [
+          {
+            "node": "Ler resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2f47af2e-0f54-4cb3-9803-3a44dd46f2a",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "lead-site-analyzer-local",
+  "tags": []
+}

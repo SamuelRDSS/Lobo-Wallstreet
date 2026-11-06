@@ -1,0 +1,110 @@
+{
+  "name": "Lobo Walstreet - WhatsApp Business Cloud - Respostas",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lobo-whatsapp/inbound-test",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "lobo-whatsapp-inbound-test-webhook",
+      "name": "Receber resposta WhatsApp",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const first = $input.first().json;\nconst body = first.body ?? first;\nconst value = body.entry?.[0]?.changes?.[0]?.value ?? body;\nconst msg = value.messages?.[0] ?? body.messageObject ?? body;\nconst contact = value.contacts?.[0] ?? {};\n\nconst message = body.message || msg.text?.body || msg.button?.text || msg.interactive?.button_reply?.title || '';\nconst phone = body.phone || body.from || msg.from || contact.wa_id || '';\nconst contactName = body.contactName || contact.profile?.name || body.name || '';\n\nreturn [{\n  json: {\n    leadId: body.leadId || null,\n    phone,\n    contactName,\n    message,\n    token: $env.LOBO_WHATSAPP_INBOUND_TOKEN || body.token || '',\n    providerPayload: body\n  }\n}];"
+      },
+      "id": "lobo-whatsapp-inbound-normalize",
+      "name": "Normalizar resposta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -380,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8088/api/whatsapp/inbound",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "lobo-whatsapp-inbound-lobo-api",
+      "name": "Atualizar CRM e IA no Lobo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, lobo: $json } }}",
+        "options": {}
+      },
+      "id": "lobo-whatsapp-inbound-response",
+      "name": "Responder evento",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        160,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Receber resposta WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Normalizar resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar resposta": {
+      "main": [
+        [
+          {
+            "node": "Atualizar CRM e IA no Lobo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualizar CRM e IA no Lobo": {
+      "main": [
+        [
+          {
+            "node": "Responder evento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "lobo-whatsapp-business-cloud-respostas",
+  "tags": []
+}

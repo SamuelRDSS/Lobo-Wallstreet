@@ -1,0 +1,139 @@
+{
+  "version": "1.0",
+  "score_weights": {
+    "base": 20,
+    "presence": {
+      "sem_site": 35,
+      "so_rede_social": 32,
+      "link_na_bio": 28,
+      "google_sites": 24,
+      "plataforma_agendamento": 18,
+      "marketplace_perfil": 16,
+      "app_mobile": 22,
+      "construtor_simples": 18,
+      "site_proprio": -18,
+      "site_informado": 4
+    },
+    "phone_present": 10,
+    "phone_missing": -12,
+    "reviews": [
+      { "min": 300, "points": 20 },
+      { "min": 100, "points": 16 },
+      { "min": 50, "points": 12 },
+      { "min": 10, "points": 6 }
+    ],
+    "rating": [
+      { "min": 4.8, "points": 10 },
+      { "min": 4.5, "points": 7 },
+      { "min": 4.0, "points": 3 }
+    ],
+    "rating_low_penalty": {
+      "max": 3.5,
+      "points": -10
+    },
+    "local_intent_bonus": 6
+  },
+  "presence_domains": {
+    "social": [
+      "instagram.com",
+      "facebook.com",
+      "fb.com",
+      "tiktok.com",
+      "youtube.com",
+      "wa.me",
+      "whatsapp.com",
+      "x.com",
+      "twitter.com"
+    ],
+    "link_hub": [
+      "linktr.ee",
+      "beacons.ai",
+      "bio.link",
+      "lnk.bio",
+      "campsite.bio",
+      "taplink.cc"
+    ],
+    "google_sites": [
+      "sites.google.com",
+      "business.site"
+    ],
+    "booking": [
+      "trinks.com",
+      "appbarber.com.br",
+      "booksy.com",
+      "calendly.com",
+      "avec.app",
+      "agendaai.com.br",
+      "reserva.ai",
+      "prks.com.br",
+      "servicosgold.com.br"
+    ],
+    "marketplace": [
+      "ifood.com.br",
+      "rappi.com.br",
+      "doctoralia.com.br",
+      "getninjas.com.br",
+      "tripadvisor.com.br",
+      "sympla.com.br",
+      "booking.com",
+      "airbnb.com"
+    ],
+    "simple_builder": [
+      "lovable.app",
+      "wixsite.com",
+      "webnode.page",
+      "wordpress.com",
+      "blogspot.com",
+      "godaddysites.com",
+      "canva.site",
+      "carrd.co"
+    ]
+  },
+  "niches": {
+    "beleza_bem_estar": {
+      "keywords": ["barbearia", "barber", "salao", "cabeleireiro", "manicure", "estetica", "spa", "sobrancelha"],
+      "local_intent": true,
+      "offer": "site com servicos, fotos, botao de WhatsApp, mapa, avaliacoes e agenda"
+    },
+    "saude_clinica": {
+      "keywords": ["clinica", "dentista", "odontologia", "medico", "fisioterapia", "psicologo", "nutricionista", "veterinaria"],
+      "local_intent": true,
+      "offer": "site de autoridade com especialidades, equipe, prova social, WhatsApp e agendamento"
+    },
+    "alimentacao": {
+      "keywords": ["restaurante", "pizzaria", "lanchonete", "hamburguer", "sushi", "padaria", "cafeteria", "acai", "delivery"],
+      "local_intent": true,
+      "offer": "site com cardapio, fotos, pedido pelo WhatsApp, delivery, horario e localizacao"
+    },
+    "automotivo": {
+      "keywords": ["oficina", "auto", "mecanica", "funilaria", "lava", "pneus", "estetica automotiva"],
+      "local_intent": true,
+      "offer": "site com servicos, orcamento via WhatsApp, localizacao, fotos e avaliacoes"
+    },
+    "fitness": {
+      "keywords": ["academia", "crossfit", "pilates", "personal", "yoga", "treinamento"],
+      "local_intent": true,
+      "offer": "site com planos, horarios, modalidades, depoimentos e matricula pelo WhatsApp"
+    },
+    "servicos_profissionais": {
+      "keywords": ["advogado", "contabilidade", "contador", "arquitetura", "engenharia", "consultoria", "imobiliaria"],
+      "local_intent": true,
+      "offer": "site institucional com autoridade, servicos, formularios, WhatsApp e SEO local"
+    },
+    "educacao": {
+      "keywords": ["escola", "curso", "idiomas", "faculdade", "reforco", "creche"],
+      "local_intent": true,
+      "offer": "site com turmas, calendario, matricula, depoimentos e contato rapido"
+    },
+    "varejo_local": {
+      "keywords": ["loja", "moda", "pet shop", "moveis", "farmacia", "otica", "floricultura", "mercado"],
+      "local_intent": true,
+      "offer": "site com catalogo, WhatsApp, localizacao, horarios, promocoes e prova social"
+    },
+    "negocio_local": {
+      "keywords": [],
+      "local_intent": true,
+      "offer": "site simples com WhatsApp, mapa, servicos, fotos, avaliacoes e chamada para contato"
+    }
+  }
+}

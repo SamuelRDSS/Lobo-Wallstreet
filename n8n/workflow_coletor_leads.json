@@ -1,0 +1,110 @@
+{
+  "name": "Lobo Walstreet - Coletor de Leads",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lobo-collector/collect-and-analyze",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "lobo-collector-webhook",
+      "name": "Webhook Coletor",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const first = $input.first().json;\nconst body = first.body ?? first;\n\nreturn [{\n  json: {\n    nicho: body.nicho || body.niche || 'barbearia',\n    cidade: body.cidade || body.city || 'São José',\n    limite: Number(body.limite || body.limit || 30),\n    provider: body.provider || 'mock',\n    preferN8n: Boolean(body.preferN8n ?? false),\n    enrichWeb: body.enrichWeb !== false\n  }\n}];"
+      },
+      "id": "lobo-collector-normalize",
+      "name": "Normalizar pedido",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8088/api/collect-and-analyze",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "lobo-collector-api",
+      "name": "Chamar Lobo API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "lobo-collector-response",
+      "name": "Responder resultado",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        260,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Coletor": {
+      "main": [
+        [
+          {
+            "node": "Normalizar pedido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar pedido": {
+      "main": [
+        [
+          {
+            "node": "Chamar Lobo API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chamar Lobo API": {
+      "main": [
+        [
+          {
+            "node": "Responder resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "lobo-lead-collector",
+  "tags": []
+}
